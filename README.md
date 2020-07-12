@@ -2,7 +2,6 @@
 Product catalog website with twitter api requests
 
 
-
 1. Install requirements.txt
 2. Get twitter developer account
 3. save api key and secret api key from twitter to reallysecret.py. Names these variables
