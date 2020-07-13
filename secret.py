@@ -36,14 +36,14 @@ def register(username,password):
         
         #if editable == False:
            # return '...'
-        path = 'random.txt'
+        path = f'{os.getcwd()}/random.txt'
         admin = open(path,'w')
         admin.write(username)
         admin.write(hashed_utf8)
         admin.close()
         
 def authenticate(username, password):
-    path = 'random.txt'
+    path = f'{os.getcwd()}/random.txt'
     admin_file = open(path,'r')
     f_username = admin_file.readline()
     f_password = admin_file.readline()
