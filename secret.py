@@ -95,7 +95,7 @@ def authenticate(username, password):
         print('invalid username')
 
 def get_route():
-    path = 'secret.txt'
+    path = f'{os.getcwd()}/secret.txt'
     route_file = open(path,'r')
     route = route_file.readline()
     route_file.close()
