@@ -53,10 +53,10 @@ def authenticate(username, password):
         if f_username == username:
             change_route = input('Change route, add admin, delete admin, or cancel: cr, a, d or c?')
             if change_route == 'cr':
-                path = 'secret.txt'
+                path = f'{os.getcwd()}/secret.txt'
                 route_file = open(path,'w')
                 #need to mention what not to use in route
-                new_route = input('Enter new route: ')
+                new_route = input('Enter new route(avoid /\@): ')
                 route_file.write(new_route)
                 route_file.close()
                 #last thing to do
