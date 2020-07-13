@@ -16,17 +16,17 @@ from sqlalchemy.exc import IntegrityError
 """PRODUCTION VS DEVELOPMENT VARIABLES"""
 
 #in production environment this needs to be commented out
-#from reallysecret import TW_API_KEY, TW_SECRET_API_KEY
+from reallysecret import TW_API_KEY, TW_SECRET_API_KEY
 
 #os.environ.pop('DATABASE_URL')
 
 #uncomment these in development mode. comment out when in production
-#consumer_key =  os.environ.get('TW_API_KEY', TW_API_KEY)# Add your API key here
-#consumer_secret =  os.environ.get('TW_SECRET_API_KEY', TW_SECRET_API_KEY) # Add your API secret key here
+consumer_key =  os.environ.get('TW_API_KEY', TW_API_KEY)# Add your API key here
+consumer_secret =  os.environ.get('TW_SECRET_API_KEY', TW_SECRET_API_KEY) # Add your API secret key here
 
 #uncomment these in production mode. comment out when in development
-consumer_key =  os.environ['TW_API_KEY']
-consumer_secret =  os.environ['TW_SECRET_API_KEY']
+#consumer_key =  os.environ['TW_API_KEY']
+#consumer_secret =  os.environ['TW_SECRET_API_KEY']
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL','postgresql:///capstone1')

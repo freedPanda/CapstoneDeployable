@@ -36,14 +36,14 @@ def register(username,password):
         
         #if editable == False:
            # return '...'
-        path = f'{os.getcwd()}/random.txt'
+        path = f'random.txt'
         admin = open(path,'w')
         admin.write(username)
         admin.write(hashed_utf8)
         admin.close()
         
 def authenticate(username, password):
-    path = f'{os.getcwd()}/random.txt'
+    path = f'random.txt'
     admin_file = open(path,'r')
     f_username = admin_file.readline()
     f_password = admin_file.readline()
@@ -54,7 +54,7 @@ def authenticate(username, password):
         if f_username == username:
             change_route = input('Change route, add admin, delete admin, or cancel: cr, a, d or c?')
             if change_route == 'cr':
-                path = f'{os.getcwd()}/secret.txt'
+                path = f'secret.txt'
                 route_file = open(path,'w')
                 #need to mention what not to use in route
                 new_route = input('Enter new route(avoid /\@): ')
@@ -89,7 +89,7 @@ def authenticate(username, password):
         print('invalid username')
 
 def get_route():
-    path = f'{os.getcwd()}/secret.txt'
+    path = f'secret.txt'
     route_file = open(path,'r')
     route = route_file.readline()
     route_file.close()
