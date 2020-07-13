@@ -47,6 +47,7 @@ def authenticate(username, password):
     admin_file = open(path,'r')
     f_username = admin_file.readline()
     f_password = admin_file.readline()
+    admin_file.close()
         #return u
     if bcrypt.check_password_hash(f_password, password):
         username += '\n'
@@ -60,7 +61,6 @@ def authenticate(username, password):
                 route_file.write(new_route)
                 route_file.close()
                 #last thing to do
-                admin_file.close()
             elif change_route == 'a':
                 connect_db(app)
                 #db.create_all()
@@ -73,25 +73,19 @@ def authenticate(username, password):
                     print(f'Success. username={admin.username}')
                 except IntegrityError:
                     print('Username already taken')
-                #last thing to do
-                admin_file.close()
             elif change_route == 'c':
-                #last thing to do
-                admin_file.close()
+                print('canceled operation')
             elif change_route == 'd':
                 connect_db(app)
                 username = input('Username to delete: ')
                 admin = Admin.query.filter_by(username = username).first()
                 db.session.delete(admin)
                 db.session.commit()
-                admin_file.close()
             else:
-                admin_file.close()
+                print('invalid entry')
         else:
-            admin_file.close()
             print('incorrect password')
     else:
-        admin_file.close()
         print('invalid username')
 
 def get_route():
