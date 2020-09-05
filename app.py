@@ -137,6 +137,7 @@ def return_product_details(product_id):
         message = form.message.data
         firstname = form.firstname.data
         lastname = form.lastname.data
+        result = ''
         try:
             send_email(message)
         except:
