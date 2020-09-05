@@ -148,9 +148,9 @@ def return_product_details(product_id):
         except:
             print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
             print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
-        if result == False:
-            flash('Error. Invalid email address.','danger')
-            return redirect(f'/products/{product_id}')
+            if result == 535: """as of now this error is concerning my google account issues. so, this will be true while less secure app access is disabled."""
+                flash('Error. Invalid email address.','danger')
+                return redirect(f'/products/{product_id}')
 
         request = Request(email=form.email.data, message=message, firstname=firstname, lastname=lastname, product=product_id)
         db.session.add(request)
@@ -629,8 +629,8 @@ def send_confirmation(recipients):
             mail.send(msg)
             return True
         except Exception as err:
-            print(err)
-            return False
+            print(err[0])
+            return err[0]
 
 def organize(prod_list):
     return_list = [] 
