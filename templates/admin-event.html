@@ -1,0 +1,38 @@
+{% extends 'index.html' %}
+<!-------PLEASE READ THIS FIRST. THIS PAGE IS RETURNED TO ADMIN ONLY---
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  from here, admins can view new tweets and twitter shares---->
+{% block nav_list %}
+  <li class="nav-item">
+      <a class="nav-link"  href="/{{route}}/admin-logout">Logout</a>
+  </li>
+  <li class='nav-itme active' style="background-color: maroon;">
+    <a class="nav-link" href="/{{route}}/admin-home">Admin Home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link"  href="/{{route}}/view-products">Products</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/{{route}}/sales">Sales</a>
+</li>
+  <li class="nav-item">
+      <a class="nav-link" href="/{{route}}/view-requests">Requests</a>
+  </li>
+  <li class="nav-item">
+      <a class="nav-link" href="/{{route}}/view-events">Events</a>
+    </li>
+{% endblock %}
+{% block background_image %}
+<body style="background-color:hsl(42, 46%, 93%); filter:contrast(120%);">
+{% endblock %}
+{% block content %}
+<div class='row'>
+  <div class="col">
+    <h5>Actions:<a href='/{{route}}/mentions' class='btn'style="color:white; background-color: maroon;">Get New Mentions</a></h5>
+  </div>
+</div>
+
+{% endblock %}
+{% block optional_scripts %}
+{% endblock %}

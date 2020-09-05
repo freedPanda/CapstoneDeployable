@@ -128,7 +128,7 @@ def show_gallery_product(product_id):
 @app.route('/products/<product_id>', methods=['GET', 'POST'])
 def return_product_details(product_id):
     """This isnt actually purchasing a product. This is just notifying
-    the website owner that they want to purchase a product or have
+    the website owner that a customer wants to purchase a product or has
     questions about a product."""
     form=PurchaseForm()
     if form.validate_on_submit():
@@ -137,8 +137,16 @@ def return_product_details(product_id):
         message = form.message.data
         firstname = form.firstname.data
         lastname = form.lastname.data
-        send_email(message)
-        result = send_confirmation(email)
+        try:
+            send_email(message)
+        except SMTPAuthenticationError:
+            print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
+            print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
+        try:
+            result = send_confirmation(email)
+        except SMTPAuthenticationError:
+            print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
+            print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
         if result == False:
             flash('Error. Invalid email address.','danger')
             return redirect(f'/products/{product_id}')
@@ -616,7 +624,7 @@ def send_confirmation(recipients):
             msg = Message(subject="Thank you for inqiury!",
                       sender=app.config.get("MAIL_USERNAME"),
                       recipients=recipients, # replace with your email for testing
-                      body='Thank you for sending a request to purchase a piece of art! This message is to confirm that your request has been sent and Eva Hjorth will response as soon as possible! Thank you and have a wonderful day!')
+                      body='Thank you for sending a request to purchase a piece of art! This message is to confirm that your request has been sent and we will response as soon as possible! Thank you and have a wonderful day!')
             mail.send(msg)
             return True
         except:
