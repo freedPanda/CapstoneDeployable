@@ -8,6 +8,7 @@ def delete_all_records():
     Product.query.delete()
     Mention.query.delete()
     Visit.query.delete()
+    db.session.commit()
 
 def delete_Requests():
     Request.query.delete()
