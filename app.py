@@ -366,8 +366,8 @@ def admin_requests():
         return redirect('/')
     
     requests = db.session.query(Product,Request).join(Request, Product.id == Request.product).all()
-    print(requests)
     for request in requests:
+        print(request[0],request[1])
         request[0].image = prepare_animage(request[0].image)
     return render_template('admin-requests.html', requests=requests, route=get_route())
 
