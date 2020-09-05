@@ -27,6 +27,12 @@
 <body style="background-color:hsl(42, 46%, 93%); filter:contrast(120%);">
 {% endblock %}
 {% block content %}
+<div>
+    {% for category, message in get_flashed_messages(with_categories=True) %}
+    <h6 class="alert alert-{{ category }}">{{ message }}</h6>
+    {% endfor %}
+</div>
+
 <div class = 'row'>
     <div class='col'></div>
     <div class ='col-10' style="background-color: white;">
@@ -37,6 +43,7 @@
                     <th scope='col'>Request</th>
                     <th scope='col'>Email</th>
                     <th scope='col'>Name</th>
+                    <th scope='col'>Product ID</th>
                     <th scope='col'>Product</th>
                     <th scope='col'>Price</th>
                 </tr>
@@ -47,6 +54,7 @@
                     <th scope="row">{{request[1].id}}</th>
                     <td>{{request[1].email}}</td>
                     <td>{{request[1].firstname}} {{request[1].lastname}}</td>
+                    <td>{{request[0].id}}</td>
                     <td><img class="d-block" style="width:8rem;" src='data:image/png;base64,{{request[0].image}}' alt="Card image cap"></td>
                     <td>${{request[0].price}}</td>
                     <td><a href='/{{route}}/delete/request/{{request[1].id}}' class='btn btn-danger btn-sm'>Delete</a></td>

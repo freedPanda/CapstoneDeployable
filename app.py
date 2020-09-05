@@ -390,15 +390,18 @@ def sold_product(request_id):
     else:
         request = Request.query.get(request_id)
         product = Product.query.get(request.product)
-        sale = Sale(firstname=request.firstname, lastname=request.lastname,
-        email=request.email,product=product.id)
-        product.available = False
-        db.session.add(product)
-        db.session.add(sale)
-        db.session.delete(request)
-        db.session.commit()
-        return redirect(f'/{get_route()}/view-requests')
-
+        if product.availabile == True:
+            sale = Sale(firstname=request.firstname, lastname=request.lastname,
+            email=request.email,product=product.id)
+            product.available = False
+            db.session.add(product)
+            db.session.add(sale)
+            db.session.delete(request)
+            db.session.commit()
+            return redirect(f'/{get_route()}/view-requests')
+        else:
+            flash('Product has already been sold. Delete this request and notify buyer.','danger')
+            return redirect(f'/{get_route()}/view-requests')
 #----------Sales routes
 @app.route(f'/{get_route()}/sales')
 def view_sales():
@@ -416,7 +419,7 @@ def admin_events():
     if not g.user:
         return redirect('/')
         
-    return render_template('events.html')
+    return render_template('admin-events.html')
     
 
 #-------------------------------IMAGE URLS--------------------------------------------------
