@@ -9,6 +9,9 @@ def delete_all_records():
     Mention.query.delete()
     Visit.query.delete()
 
+def delete_Requests():
+    Request.query.delete()
+
 def fill_db():
     add_fake_mentions()
     add_fake_products()
