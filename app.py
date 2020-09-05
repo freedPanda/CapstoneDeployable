@@ -146,11 +146,12 @@ def return_product_details(product_id):
             print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
         
         result = send_confirmation(email)
-        print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
-        print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
+        
         print(result)
         """as of now this error is concerning my google account issues. so, this will be true while less secure app access is disabled."""
         if result == 535:
+            print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
+            print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
             flash('Error. Invalid email address.','danger')
             return redirect(f'/products/{product_id}')
 
@@ -631,7 +632,11 @@ def send_confirmation(recipients):
             mail.send(msg)
             return True
         except smtplib.SMTPAuthenticationError as err:
+            print(err)
             return 535
+        except Exception as err1:
+            print(err1)
+            return False
 
 def organize(prod_list):
     return_list = [] 
