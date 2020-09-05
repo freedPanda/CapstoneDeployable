@@ -56,6 +56,7 @@ CURR_USER_KEY = 'username'
 
 app.config.update(mail_settings)
 mail = Mail(app)
+mail.connect()
 
 connect_db(app)
 
@@ -365,7 +366,7 @@ def admin_requests():
         return redirect('/')
     
     requests = db.session.query(Product,Request).join(Request, Product.id == Request.product).all()
-    
+    print(requests)
     for request in requests:
         request[0].image = prepare_animage(request[0].image)
     return render_template('admin-requests.html', requests=requests, route=get_route())
