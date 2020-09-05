@@ -390,7 +390,7 @@ def sold_product(request_id):
     else:
         request = Request.query.get(request_id)
         product = Product.query.get(request.product)
-        if product.availabile == True:
+        if product.available == True:
             sale = Sale(firstname=request.firstname, lastname=request.lastname,
             email=request.email,product=product.id)
             product.available = False
