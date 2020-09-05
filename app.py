@@ -9,6 +9,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 import io, base64, math
 from base64 import b64encode
 import os, os.path
+import smtplib
 from datetime import date
 from requests_oauthlib import OAuth1Session
 from sqlalchemy.exc import IntegrityError
