@@ -11,6 +11,7 @@ def delete_all_records():
 
 def delete_Requests():
     Request.query.delete()
+    db.session.commit()
 
 def fill_db():
     add_fake_mentions()
