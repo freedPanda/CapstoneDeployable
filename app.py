@@ -143,13 +143,12 @@ def return_product_details(product_id):
         except:
             print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
             print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
-        try:
-            result = send_confirmation(email)
-            print(result)
-        except:
-            print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
-            print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
-            """as of now this error is concerning my google account issues. so, this will be true while less secure app access is disabled."""
+        
+        result = send_confirmation(email)
+        print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
+        print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
+        print(result)
+        """as of now this error is concerning my google account issues. so, this will be true while less secure app access is disabled."""
         if result == 535:
             flash('Error. Invalid email address.','danger')
             return redirect(f'/products/{product_id}')
