@@ -366,9 +366,11 @@ def admin_requests():
         return redirect('/')
     
     requests = db.session.query(Product,Request).join(Request, Product.id == Request.product).all()
+    #issue here is that the image has already been decoded
     for request in requests:
         print(request[0],request[1])
-        request[0].image = prepare_animage(request[0].image)
+        if isinstance(request[0].image,str) == False:
+            request[0].image = prepare_animage(request[0].image)
     return render_template('admin-requests.html', requests=requests, route=get_route())
 
 @app.route(f'/{get_route()}/delete/request/<request_id>')
