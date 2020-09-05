@@ -148,13 +148,13 @@ def return_product_details(product_id):
         result = send_confirmation(email)
         
         print(result)
-        """as of now this error is concerning my google account issues. so, this will be true while less secure app access is disabled."""
+        
         if result == 535:
             print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
             print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
+        elif result == False:  
             flash('Error. Invalid email address.','danger')
             return redirect(f'/products/{product_id}')
-
         request = Request(email=form.email.data, message=message, firstname=firstname, lastname=lastname, product=product_id)
         db.session.add(request)
         db.session.commit()
