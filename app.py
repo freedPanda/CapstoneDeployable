@@ -630,6 +630,7 @@ def send_confirmation(recipients):
             mail.send(msg)
             return True
         except Exception as err:
+            print(err)
             print(err[0])
             return err[0]
 
