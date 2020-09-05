@@ -12,13 +12,13 @@ class AdminForm(FlaskForm):
 
 class ProductForm(FlaskForm):
     image = FileField('image 1', validators=[FileRequired(), 
-    FileAllowed(['jpg','png'],'Images only')])
+    FileAllowed(['jpg','png','jpeg'],'Images only')])
     image1 = FileField('image 2',validators=[ 
-    FileAllowed(['jpg','png'],'Images only')],)
+    FileAllowed(['jpg','png','jpeg'],'Images only')],)
     image2 = FileField('image 3',validators=[ 
-    FileAllowed(['jpg','png'],'Images only')],)
+    FileAllowed(['jpg','png','jpeg'],'Images only')],)
     image3 = FileField('image 4',validators=[ 
-    FileAllowed(['jpg','png'],'Images only')],)
+    FileAllowed(['jpg','png','jpeg'],'Images only')],)
     price = IntegerField('price', validators=[InputRequired()])
     title = StringField('title', validators=[InputRequired(), Length(max=20)])
     description = StringField('description', validators=[InputRequired()])
@@ -38,16 +38,16 @@ class EditForm(FlaskForm):
 
     changeimage = BooleanField('Change Main Image')
     image = FileField('image 1', validators=[ 
-    FileAllowed(['jpg','png'],'Images only')], render_kw={'disabled':''} )
+    FileAllowed(['jpg','png','jpeg'],'Images only')], render_kw={'disabled':''} )
     changeimage1 = BooleanField('Change Second Image')
     image1 = FileField('image 2', validators=[ 
-    FileAllowed(['jpg','png'],'Images only')],render_kw={'disabled':''})
+    FileAllowed(['jpg','png','jpeg'],'Images only')],render_kw={'disabled':''})
     changeimage2 = BooleanField('Change Third Image')
     image2 = FileField('image 3', validators=[ 
-    FileAllowed(['jpg','png'],'Images only')],render_kw={'disabled':''})
+    FileAllowed(['jpg','png','jpeg'],'Images only')],render_kw={'disabled':''})
     changeimage3 = BooleanField('Change Fourth Image')
     image3 = FileField('image 4', validators=[ 
-    FileAllowed(['jpg','png'],'Images only')],render_kw={'disabled':''})
+    FileAllowed(['jpg','png','jpeg'],'Images only')],render_kw={'disabled':''})
     price = IntegerField('price', validators=[InputRequired()])
     title = StringField('title', validators=[InputRequired(), Length(max=13)])
     description = StringField('description', validators=[InputRequired()])

@@ -139,12 +139,12 @@ def return_product_details(product_id):
         lastname = form.lastname.data
         try:
             send_email(message)
-        except SMTPAuthenticationError:
+        except:
             print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
             print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
         try:
             result = send_confirmation(email)
-        except SMTPAuthenticationError:
+        except:
             print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
             print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
         if result == False:
