@@ -628,7 +628,8 @@ def send_confirmation(recipients):
                       body='Thank you for sending a request to purchase a piece of art! This message is to confirm that your request has been sent and we will response as soon as possible! Thank you and have a wonderful day!')
             mail.send(msg)
             return True
-        except:
+        except Exception as err:
+            print(err)
             return False
 
 def organize(prod_list):
