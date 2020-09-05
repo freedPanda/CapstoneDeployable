@@ -144,6 +144,7 @@ def return_product_details(product_id):
             print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
         try:
             result = send_confirmation(email)
+            print(result)
         except:
             print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
             print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
