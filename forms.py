@@ -33,7 +33,8 @@ class PurchaseForm(FlaskForm):
     lastname = StringField('Last name', validators=[InputRequired()])
     email = StringField('Email', validators=[InputRequired(),Email(message='Please provide a valid email')])
     message = TextAreaField('Message', validators=[Length(max=200)])
-    
+    product_id = StringField('Product Id', validators=[InputRequired()])
+
 class EditForm(FlaskForm):
 
     changeimage = BooleanField('Change Main Image')

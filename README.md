@@ -1,6 +1,12 @@
 # ProductCatalogTwitterApi
 Product catalog website with twitter api requests
 
+Key features
+-bcrypt encrytion
+-capture tweets from twitter
+-stores data of sales, tweets, products in database
+-manage inventory
+
 
 1. Install requirements.txt
 2. Get twitter developer account

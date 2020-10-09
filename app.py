@@ -1,33 +1,36 @@
 from flask import Flask, request, make_response, g, send_file, render_template, session, redirect, abort, jsonify, flash
 from flask_mail import Mail, Message
-from image import Image
+#from image import Image
 from PIL import Image
 from secret import get_route
 from forms import AdminForm, ProductForm, PurchaseForm, EditForm, ApiAuth
 from models import *
+from mentions import ResponseMention
 from flask_debugtoolbar import DebugToolbarExtension
 import io, base64, math
 from base64 import b64encode
 import os, os.path
 import smtplib
-from datetime import date
+from helpers import Helper
+from FormsHandle import FormsHandle
+from datetime import date, timedelta
 from requests_oauthlib import OAuth1Session
 from sqlalchemy.exc import IntegrityError
 
 """PRODUCTION VS DEVELOPMENT VARIABLES"""
 
 #in production environment this needs to be commented out
-#from reallysecret import TW_API_KEY, TW_SECRET_API_KEY
+from reallysecret import TW_API_KEY, TW_SECRET_API_KEY
 
 #os.environ.pop('DATABASE_URL')
 
 #uncomment these in development mode. comment out when in production
-#consumer_key =  os.environ.get('TW_API_KEY', TW_API_KEY)# Add your API key here
-#consumer_secret =  os.environ.get('TW_SECRET_API_KEY', TW_SECRET_API_KEY) # Add your API secret key here
+consumer_key =  os.environ.get('TW_API_KEY', TW_API_KEY)# Add your API key here
+consumer_secret =  os.environ.get('TW_SECRET_API_KEY', TW_SECRET_API_KEY) # Add your API secret key here
 
 #uncomment these in production mode. comment out when in development
-consumer_key =  os.environ['TW_API_KEY']
-consumer_secret =  os.environ['TW_SECRET_API_KEY']
+#consumer_key =  os.environ['TW_API_KEY']
+#consumer_secret =  os.environ['TW_SECRET_API_KEY']
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL','postgresql:///capstone1')
@@ -70,6 +73,9 @@ def add_user_to_g():
 
     if CURR_USER_KEY in session:
         g.user = Admin.query.filter_by(username=session[CURR_USER_KEY])
+        #the following code will make sure the admin is automatically logged out after
+        #15min
+        app.permanent_session_lifetime = timedelta(minutes=15)
 
     else:
         g.user = None
@@ -99,31 +105,26 @@ def home_page():
 def return_products_page():
     products = Product.query.filter_by(available=True).all()
         
-    products = prepare_image(products)
+    for product in products:
+        product.prepare_to_show()
     for product in products:
         product.available = 'Available'
 
-    organized_products = organize(products)
+    organized_products = Helper.organize_products(products)
     return render_template('products2.html',rows=organized_products)
 
 @app.route('/gallery')
 def show_gallery():
     products = Product.query.filter_by(available=False).all()
-    products = prepare_image(products)
-    organized_products = organize(products)
+    for product in products:
+        product.prepare_to_show()
+    organized_products = Helper.organize_products(products)
     return render_template('gallery.html',rows=organized_products)
 
 @app.route('/gallery/<product_id>')
 def show_gallery_product(product_id):
     product = Product.query.get(product_id)
-    f = b64encode(product.image).decode('utf-8')
-    product.image = f
-    if product.image1:
-        product.image1 = prepare_animage(product.image1)
-    if product.image2:
-        product.image2 = prepare_animage(product.image2)
-    if product.image3:
-        product.image3 = prepare_animage(product.image3) 
+    product.prepare_to_show()
 
     return render_template('gallery-product.html', product=product) 
 
@@ -134,14 +135,12 @@ def return_product_details(product_id):
     questions about a product."""
     form=PurchaseForm()
     if form.validate_on_submit():
+        request = Request.form_to_model(form)
         email = []
-        email.append(form.email.data)
-        message = form.message.data
-        firstname = form.firstname.data
-        lastname = form.lastname.data
+        email.append(request.email)
         result = ''
         try:
-            send_email(message)
+            send_email(request.message)
         except:
             print('GOOGLE ACCOUNT SETTINGS FOR LESS SECURE APP SHOULD BE ENABLED')
             print('GOOGLE ACCOUNT SETTINGS THE DEVICE SHOULD VERIFIED FOR USE')
@@ -156,23 +155,18 @@ def return_product_details(product_id):
         elif result == False:  
             flash('Error. Invalid email address.','danger')
             return redirect(f'/products/{product_id}')
-        request = Request(email=form.email.data, message=message, firstname=firstname, lastname=lastname, product=product_id)
+        #request = Request(email=form.email.data, message=message, firstname=firstname, lastname=lastname, product=product_id)
         db.session.add(request)
         db.session.commit()
         return redirect(f'/request/{product_id}')
     product = Product.query.get(product_id)
 
     #need to convert an image for html to display
-    f = b64encode(product.image).decode('utf-8')
-    product.image = f
-    if product.image1:
-        product.image1 = prepare_animage(product.image1)
-    if product.image2:
-        product.image2 = prepare_animage(product.image2)
-    if product.image3:
-        product.image3 = prepare_animage(product.image3)  
+    product.prepare_to_show()
           
     product.available = 'Available'
+
+    form.product_id.data = product.id
 
     return render_template('product.html', product=product, form=form)
 
@@ -180,8 +174,8 @@ def return_product_details(product_id):
 @app.route('/request/<product_id>')
 def confirm_request(product_id):
     product = Product.query.get(product_id)
-    f = b64encode(product.image).decode('utf-8')
-    product.image = f
+    #prepare image to be displayed in web browser
+    product.prepare_to_show()
     return render_template('confirm.html', product=product)
 
 @app.route('/events')
@@ -227,7 +221,7 @@ def admin_home():
         return redirect('/')
 
     tweet_stats = get_tweet_stats()
-    mention_info = get_mention_info()
+    mention_info = Mention.query.all()
     return render_template('admin.html', route=get_route(), data = tweet_stats, mention_info = mention_info)
 
 @app.route(f'/{get_route()}/admin-logout')
@@ -249,23 +243,10 @@ def admin_products():
         form = ProductForm()
         #add product to db
         if form.validate_on_submit():
-            description = form.description.data
-            category = form.category.data
-            image = form.image.data
-            image1 = form.image1.data
-            image2 = form.image2.data
-            image3 = form.image3.data
-            price = form.price.data
-            title = form.title.data
-            available=form.available.data
+            product = Product.form_to_model(form)
             #converting images into bytes like object
-            image = check_image(image)
-            image1 = check_image(image1)
-            image2 = check_image(image2)
-            image3 = check_image(image3)
-            product = Product(image=image, image1=image1,image2=image2,
-            image3=image3,category=category,description=description,
-            price=price, available=available, title=title)
+            #prepare images to be stored
+            product.prepare_to_store()
             db.session.add(product)
             db.session.commit()
 
@@ -279,8 +260,9 @@ def admin_products():
                     product.availabile = 'Available'
                 else:
                     product.availabile = 'Sold'
-            products = prepare_image(products)
-            organized_products = organize(products)
+            for product in products:
+                product.prepare_to_show()
+            organized_products = Helper.organize_products(products)
             return render_template('view-products.html', form=form, rows=organized_products, route=get_route())
    
 #---------ADMIN EDIT PRODUCT
@@ -296,55 +278,18 @@ def edit_product(product_id):
         
         form = EditForm(obj=product)
         if form.validate_on_submit():
+            product.update_product(form)
             
-            changeimage = form.changeimage.data
-            changeimage1 = form.changeimage1.data
-            changeimage2 = form.changeimage2.data
-            changeimage3 = form.changeimage3.data
-            #check to see if images need to be updated
-            if changeimage:
-                image = form.image.data
-                image = check_image(image)
-                product.image = image
-            if changeimage1:
-                image1 = form.image1.data
-                image1 = check_image(image1)
-                product.image1 = image1
-            if changeimage2:
-                image2 = form.image2.data
-                image2 = check_image(image2)
-                product.image2 = image2
-            if changeimage3:
-                image3 = form.image3.data
-                image3 = check_image(image3)
-                product.image3 = image3
-            description = form.description.data
-            category = form.category.data
-            price = form.price.data
-            title = form.title.data
-            available=form.available.data
-
-            product.category = category
-            product.description = description
-            product.price = price
-            product.title = title
-            product.available = available
             db.session.add(product)
             db.session.commit()
             return redirect(f'/{get_route()}/{product.id}')
             
         else:
+            #prepare an image for display
+            product.prepare_to_show()
             availability = 'Sold'
             if product.available:
                 availability = 'Available'
-            product.image = prepare_animage(product.image)
-            if product.image1:
-                product.image1 = prepare_animage(product.image1)
-            if product.image2:
-                product.image2 = prepare_animage(product.image2)
-            if product.image3:
-                product.image3 = prepare_animage(product.image3) 
-
             
             return render_template('admin-products-edit.html', product = product, form=form, route=get_route(), availability=availability)
     
@@ -465,40 +410,9 @@ def get_mention_data():
                             resource_owner_secret=access_token_secret)
             #get list of 20 most recent mentions
             response = oauth.get("https://api.twitter.com/1.1/statuses/mentions_timeline.json")
-            thejson = response.json()
-            for obj in thejson:
-                #tweet text
-                text = obj['text']
-                #format the date
-                date = obj['created_at'] 
-                m_d = date[4:10]
-                y = date[25:30]
-                date = m_d + y
-                #get tweet id
-                tweet_id = obj['id_str']
-                #get user
-                user = obj['user']
-                screen_name = user['screen_name']
-                #get hashtags
-                entities = obj['entities']
-                hashtags = ''
-                hashtags_list = entities['hashtags']
-                for obj in hashtags_list:
-                    hashtags = hashtags + f'{obj["text"]} '
-                #store twitter data in class model
-                mention = Mention(tweetid=tweet_id,date=date,hashtags=hashtags,screenname=screen_name, text=text)
-                #check the hashtags
-                if len(hashtags) < 2:
-                    mention.hashtags = None
-                #check to make sure no duplicates are entered into db
-                mentions_in_db = Mention.query.all()
-                dup_found = False
-                for mention_in_db in mentions_in_db:
-                    if mention.tweetid == mention_in_db.tweetid:
-                        dup_found = True
-                if dup_found == False:
-                    db.session.add(mention)
-                    db.session.commit()
+            jsondata = response.json()
+            Mention.avoid_duplication(jsondata)
+
             return redirect(f'/{get_route()}/admin-home')
 
         else:
@@ -545,6 +459,22 @@ def shared_site():
         return jsonify('nothing', 201)
 
 def get_tweet_stats():
+    #instead get year month day in a tuple, then make an array of years,
+    #then make an array of months
+    stat_package = {}
+    months_list = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Nov','Dec']
+    visits = db.session.query(Visit.year, Visit.month)
+    for visit in visits:
+        if (visit.year) not in stat_package.keys():
+            #stat_package.append({visit.year:[]})
+            stat_package[visit.year] = {}
+            for month in months_list:
+                year = stat_package[visit.year][month] = 0
+                #if visit.month == stat_package[vi]
+            stat_package[visit.year][visit.month] += 1
+        else:
+            stat_package[visit.year][visit.month] += 1
+    """
     distinct_years = Visit.query.distinct(Visit.year)
     package = []
     for dyears in distinct_years:
@@ -554,38 +484,16 @@ def get_tweet_stats():
         for (year,months) in years.items():
             for month in months_list:
                 months.append({month:Visit.query.filter_by(year=year,month=month).count()})
-    return package            
+    """
+    return stat_package            
 
 """Helper functions"""
-#used when a list of products are taken out of the database
-def prepare_image(product_list):
-    for product in product_list:
-        f = b64encode(product.image).decode('utf-8')
-        product.image = f
-    return product_list
-
-#used when a list of images are taken out of the database
-def prepare_image_list(images):
-    for image in images:
-        f = b64encode(image).decode('utf-8')
-        image = f
-    return images
 
 #used when an image is being taken out of the database
 def prepare_animage(image):
     f = b64encode(image).decode('utf-8')
     image = f
     return image
-
-#used when an image is being processed into the database
-def check_image(image):
-    if image:
-        thing = io.BytesIO(image.read())
-        new_thing = thing.read()
-        thing.close()
-        return new_thing
-    else:
-        return None
 
 #a function that is in development
 def bytes_to_image(image,id):
@@ -606,17 +514,6 @@ def bytes_to_image(image,id):
     else:
         return None    
 
-#if provided a product with multiple images, will return a list of the product's images
-def make_image_list(product):
-    return_list = []
-    if product.image1:
-        return_list.append(product.image1)
-    if product.image2:
-        return_list.append(product.image2)
-    if product.image3:
-        return_list.append(product.image3)
-    return_list = prepare_image_list(return_list)
-    return return_list
 #------this method notifies owner of a potential product purchase
 def send_email(body):
     with app.app_context():
@@ -643,17 +540,3 @@ def send_confirmation(recipients):
         except Exception as err1:
             print(err1)
             return False
-
-def organize(prod_list):
-    return_list = [] 
-    row_count = math.ceil(len(prod_list)/4)
-    start = 0
-    end = 4
-    for num in range(row_count):
-        return_list.append(prod_list[start:end])
-        start = start + 4
-        end = end + 4
-    return return_list 
-
-def get_mention_info():
-    return Mention.query.all()

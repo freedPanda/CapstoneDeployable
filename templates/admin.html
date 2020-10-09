@@ -36,8 +36,7 @@
 <div class='row'>
   <div class='col-5 border border-dark' style="background-color: white; height: min-content;">
       <h5>Tweet Stats</h5>
-      {% for years in data %}
-        {% for (year,months) in years.items() %}
+        {% for (year,months) in data.items() %}
         <div class="container" >
           <button class="btn btn-info" id='button-{{year}}'type="button" data-toggle="collapse" data-target="#{{year}}" aria-expanded="false" aria-controls="{{year}}">View {{year}}</button>
           <div id='{{year}}' style="display: none;">
@@ -49,16 +48,16 @@
                 </tr>
               </thead>
               <tbody>
-                {% for month in months %}
+                {% for (k,v) in months.items() %}
                 <tr>
-                    {% for (k,v) in month.items() %}
+                    
                       <th scope="row">{{k}}</th>
                       {% if v > 0 %}
                       <td style="background-color: green;">{{v}}</td>
                       {% else %}
                       <td>{{v}}</td>
                       {% endif %}
-                    {% endfor %}
+                    
                 </tr>
                 {% endfor %}
               </tbody>
@@ -67,7 +66,6 @@
           
         </div>
         
-      {% endfor %}
       {% endfor %}
   </div>
   <div class = 'col-7 border border-dark' style="background-color: white; height: min-content;">

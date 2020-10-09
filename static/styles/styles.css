@@ -49,4 +49,14 @@ input{
     color:red;
 }
 
+#product_id{
+    display:none;
+    color:grey;
+    pointer-events: none;
+}
+label[for="product_id"]{
+    color: grey;
+    display:none;
+}
+
 
