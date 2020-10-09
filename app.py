@@ -22,7 +22,7 @@ from sqlalchemy.exc import IntegrityError
 #in production environment this needs to be commented out
 #from reallysecret import TW_API_KEY, TW_SECRET_API_KEY
 
-os.environ.pop('DATABASE_URL')
+#os.environ.pop('DATABASE_URL')
 
 #uncomment these in development mode. comment out when in production
 #consumer_key =  os.environ.get('TW_API_KEY', TW_API_KEY)# Add your API key here
