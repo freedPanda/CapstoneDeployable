@@ -462,7 +462,7 @@ def get_tweet_stats():
     #instead get year month day in a tuple, then make an array of years,
     #then make an array of months
     stat_package = {}
-    months_list = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Nov','Dec']
+    months_list = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     visits = db.session.query(Visit.year, Visit.month)
     for visit in visits:
         if (visit.year) not in stat_package.keys():
@@ -480,9 +480,9 @@ def get_tweet_stats():
     for dyears in distinct_years:
         package.append({dyears.year:[]})
     months_list = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Nov','Dec']
-    for years in package:
-        for (year,months) in years.items():
-            for month in months_list:
+    foears.items():
+            for month in monthr years in package:
+        for (year,months) in ys_list:
                 months.append({month:Visit.query.filter_by(year=year,month=month).count()})
     """
     return stat_package            
